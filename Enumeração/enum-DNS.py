@@ -28,7 +28,7 @@ def Cname(dominio_completo):
     
     for i in resposta:
         print(f"{dominio_completo} - {i.target}")
-        with open(f"cname-{dominio}.txt", "a") as save:
+        with open(f"resultado-cname-{dominio}.txt", "a") as save:
             save.write(f"{dominio_completo} - {i.target}\n")
     return resposta
 
