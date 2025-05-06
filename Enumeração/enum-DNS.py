@@ -1,11 +1,15 @@
 import socket
 import dns.resolver
+import dnsmenu
 from concurrent.futures import ThreadPoolExecutor
+
+menu = dnsmenu.Menu
 
 help = """
     [help]
     -c = cname
     -d = dns resolver
+    -w = whois
 """
 print(help)
 tipo = input("Escolha o tipo: ")
@@ -32,6 +36,53 @@ def Cname(dominio_completo):
             save.write(f"{dominio_completo} - {i.target}\n")
     return resposta
 
+def Whois(dominio):
+    d = dominio + "\r\n"
+    def Opensocket(dominio, d):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((dominio, 43))
+        s.send((d.encode()))
+        return s
+
+    if ".br" in dominio:
+        s = Opensocket("whois.iana.org", d)
+        whois1 = s.recv(1024).decode().split("refer:        ")[1].split("\n\n")[0]
+        s.close()
+
+        s = Opensocket(whois1, d)
+        resultado_br = ""
+        while True:
+            data_br = s.recv(8040)
+            if data_br:
+                resultado_br += data_br.decode()
+            else:
+                break 
+
+            with open(f"scans/{dominio}/{dominio}.whois.txt", "w") as f:
+                f.write(resultado_br)
+        s.close()
+    else:
+        s = Opensocket("whois.iana.org", d)
+        whois1 = s.recv(1024).decode().split("refer:        ")[1].split("\n\n")[0]
+        s.close()
+
+        s = Opensocket(whois1, d)
+        whois2 = s.recv(1024).decode().split("Registrar WHOIS Server: ")[1].split("\r\n")[0]
+        s.close()
+
+        s = Opensocket(whois2, d)
+        resultado = ""
+        while True:
+            data = s.recv(8040)
+            if data: 
+                resultado += data.decode()
+            else:
+                break 
+
+            with open(f"scans/{dominio}{dominio}.whois.txt", "w") as f:
+                f.write(resultado)
+        s.close()
+    return 0
 
 with open("subdomains-10000.txt", "r") as sub:
     subdominio = [linha.strip() for linha in sub.readlines()]
@@ -47,3 +98,5 @@ with ThreadPoolExecutor(max_workers=100) as exe:
             exe.submit(Cname, f"{sub}.{dominio}")
             for sub in subdominio
         ]
+    elif tipo == "-w":
+        Whois(dominio)
