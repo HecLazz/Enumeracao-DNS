@@ -15,13 +15,15 @@ print(help)
 tipo = input("Escolha o tipo: ")
 dominio = input("Digite o dominio: ")
 
+menu(dominio)
+
 def Dns(dominio_completo):
     try:
         dns = socket.getaddrinfo(dominio_completo, 43, family=socket.AF_INET, proto=socket.IPPROTO_TCP)
         addr = dns[0][4][0]
         print(f"{dominio_completo} - {addr}")
 
-        with open(f"resultado-{dominio}.txt", "a") as save:
+        with open(f"scans/{dominio}/resultado-{dominio}.txt", "a") as save:
             save.write(f"{dominio_completo} - {addr}\n")
         return addr
     except socket.gaierror:
@@ -32,7 +34,7 @@ def Cname(dominio_completo):
     
     for i in resposta:
         print(f"{dominio_completo} - {i.target}")
-        with open(f"resultado-cname-{dominio}.txt", "a") as save:
+        with open(f"scans/{dominio}/resultado-cname-{dominio}.txt", "a") as save:
             save.write(f"{dominio_completo} - {i.target}\n")
     return resposta
 
@@ -79,18 +81,19 @@ def Whois(dominio):
             else:
                 break 
 
-            with open(f"scans/{dominio}{dominio}.whois.txt", "w") as f:
+            with open(f"scans/{dominio}/{dominio}.whois.txt", "w") as f:
                 f.write(resultado)
         s.close()
     return 0
 
-with open("subdomains-10000.txt", "r") as sub:
+# Aqui coloque o caminho absoluto do arquivo "subdomains-10000.txt"
+with open("/home/kali/Documents/Enumeracao-DNS/Enumeração/subdomains-10000.txt", "r") as sub:
     subdominio = [linha.strip() for linha in sub.readlines()]
         
 with ThreadPoolExecutor(max_workers=100) as exe:
     if tipo == "-d":
         futures = [
-            exe.submit(Dns, f"{sub}.{dominio}" )
+            exe.submit(Dns, f"{sub}.{dominio}")
             for sub in subdominio
         ]
     elif tipo == "-c":

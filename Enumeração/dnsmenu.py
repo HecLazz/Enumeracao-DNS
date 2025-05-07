@@ -8,3 +8,5 @@ class Menu:
 
         if os.path.exists(f"scans/{dominio}") == False:
             os.mkdir(f"scans/{dominio}")
+            
+        
