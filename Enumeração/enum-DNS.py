@@ -3,19 +3,25 @@ import dns.resolver
 import dnsmenu
 from concurrent.futures import ThreadPoolExecutor
 
-menu = dnsmenu.Menu
+inicio = dnsmenu.Menu
 
 help = """
     [help]
     -c = cname
     -d = dns resolver
     -w = whois
+    
+    Você pode digitar 'menu' no tipo, que abrirá as pastas salvas em scans
 """
 print(help)
 tipo = input("Escolha o tipo: ")
 dominio = input("Digite o dominio: ")
+        
+inicio.menu(dominio)
 
-menu(dominio)
+inicio(dominio)
+
+
 
 def Dns(dominio_completo):
     try:
@@ -23,7 +29,7 @@ def Dns(dominio_completo):
         addr = dns[0][4][0]
         print(f"{dominio_completo} - {addr}")
 
-        with open(f"scans/{dominio}/resultado-{dominio}.txt", "a") as save:
+        with open(f"scans/{dominio}/{dominio}.dns.txt", "a") as save:
             save.write(f"{dominio_completo} - {addr}\n")
         return addr
     except socket.gaierror:
@@ -34,7 +40,7 @@ def Cname(dominio_completo):
     
     for i in resposta:
         print(f"{dominio_completo} - {i.target}")
-        with open(f"scans/{dominio}/resultado-cname-{dominio}.txt", "a") as save:
+        with open(f"scans/{dominio}/{dominio}.cname.txt", "a") as save:
             save.write(f"{dominio_completo} - {i.target}\n")
     return resposta
 
