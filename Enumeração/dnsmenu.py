@@ -10,19 +10,22 @@ class Menu:
             os.mkdir(f"scans/{dominio}")
             
     def menu(dominio):
-        
-        id = 0
-        scans = os.listdir(f"scans/{dominio}")
-    
-        for i in scans:
-            print(f"{id} - {i}")
-            id += 1
+        try:
+            id = 0
+            scans = os.listdir(f"scans/{dominio}")
 
-        print("Escolha o ID do arquivo")
-        arquivo = int(input("> "))
+            print("==============================\n")
+            for i in scans:
+                print(f"{id} - {i}")
+                id += 1
 
-        caminho_arquivo = scans[arquivo]
-        print(caminho_arquivo)
-        with open(f"scans/{dominio}/{caminho_arquivo}", "r") as f:
-            tipo = f.read()
-        print(tipo)
+            print("\nEscolha o ID do arquivo\n")
+            arquivo = int(input("> "))
+
+            caminho_arquivo = scans[arquivo]
+            print(caminho_arquivo)
+            with open(f"scans/{dominio}/{caminho_arquivo}", "r") as f:
+                tipo = f.read()
+            print(tipo)
+        except FileNotFoundError:
+            print("\nArquivo não foi gerado!\n")

@@ -16,8 +16,9 @@ help = """
 print(help)
 tipo = input("Escolha o tipo: ")
 dominio = input("Digite o dominio: ")
-        
-inicio.menu(dominio)
+
+if tipo == "menu":  
+    inicio.menu(dominio)
 
 inicio(dominio)
 
